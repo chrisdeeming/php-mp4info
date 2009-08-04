@@ -90,6 +90,13 @@ class MP4Info_Box_tkhd extends MP4Info_Box {
 	protected $height;
 	
 	/**
+	 * Track Id
+	 *
+	 * @var int
+	 */
+	protected $trackId;
+	
+	/**
 	 * Time zone
 	 *
 	 * @var int
@@ -199,6 +206,18 @@ class MP4Info_Box_tkhd extends MP4Info_Box {
 	 */
 	public function getDuration() {
 		return $this->duration;
+	} // getDuration method
+	
+	
+	/**
+	 * TrackId getter
+	 *
+	 * @author 	Tommy Lacroix <lacroix.tommy@gmail.com>
+	 * @return 	int
+	 * @access 	public
+	 */
+	public function getTrackId() {
+		return $this->trackId;
 	} // getDuration method
 
 	

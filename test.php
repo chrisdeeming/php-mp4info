@@ -21,19 +21,20 @@ $dir = './TestFiles/';
 $de = opendir($dir);
 if ($de) {
 	while (($file = readdir($de)) !== false) {
+		if ((isset($_GET['file'])) && ($_GET['file'] != $file)) continue;
 		$path = $dir.$file;
-		if ((!is_file($path)) || (!is_readable($path)) || (strtolower(pathinfo($path,PATHINFO_EXTENSION) != 'f4v'))) continue;
+		if ((!is_file($path)) || (!is_readable($path))) continue;
 		
 		print '<h2>'.$file.'</h2>';
 		print "<pre>";
 		try {
-			print_r(MP4Info::getInfo($path));
+			print htmlentities(var_export(MP4Info::getInfo($path),true),null,'UTF-8');
 		} catch (MP4Info_Exception $e) {
 			print 'Caught MP4Info_Exception with message '.$e->getMessage();
-			throw ($e);
+			//throw ($e);
 		} catch (Exception $e) {
 			print 'Cauth Exception with message '.$e->getMessage();
-			throw ($e);
+			//throw ($e);
 		}
 		print "</pre>";
 		print '<hr/>';

@@ -63,22 +63,22 @@ class MP4Info_Box_ftyp extends MP4Info_Box {
 		'caep' => 'Canon Digital Camera',
 		'caqv' => 'Casio Digital Camera',
 		'cdes' => 'Convergent Design',
-		'f4v' => 'Video for Adobe Flash Player 9+ (.F4V)',
-		'f4p' => 'Protected Video for Adobe Flash Player 9+ (.F4P)',
-		'f4a' => 'Audio for Adobe Flash Player 9+ (.F4A)',
-		'f4b' => 'Audio Book for Adobe Flash Player 9+ (.F4B)',
+		'f4v ' => 'Video for Adobe Flash Player 9+ (.F4V)',
+		'f4p ' => 'Protected Video for Adobe Flash Player 9+ (.F4P)',
+		'f4a ' => 'Audio for Adobe Flash Player 9+ (.F4A)',
+		'f4b ' => 'Audio Book for Adobe Flash Player 9+ (.F4B)',
 		'isc2' => 'ISMACryp 2.0 Encrypted File',
 		'iso2' => 'MP4 Base Media v2 [ISO 14496-12:2005]',
 		'isom' => 'MP4  Base Media v1 [IS0 14496-12:2003]',
-		'jp2' => 'JPEG 2000 Image (.JP2) [ISO 15444-1 ?]',
+		'jp2 ' => 'JPEG 2000 Image (.JP2) [ISO 15444-1 ?]',
 		'jp20' => 'Unknown, from GPAC samples (prob non-existent)',
-		'jpm' => 'JPEG 2000 Compound Image (.JPM) [ISO 15444-6]',
-		'jpx' => 'JPEG 2000 w/ extensions (.JPX) [ISO 15444-2]',
+		'jpm ' => 'JPEG 2000 Compound Image (.JPM) [ISO 15444-6]',
+		'jpx ' => 'JPEG 2000 w/ extensions (.JPX) [ISO 15444-2]',
 		'kddi' => '3GPP2 EZmovie for KDDI 3G Cellphones',
-		'm4a ' => 'Apple iTunes AAC-LC (.M4A) Audio',
-		'm4b ' => 'Apple iTunes AAC-LC (.M4B) Audio Book',
-		'm4p ' => 'Apple iTunes AAC-LC (.M4P) AES Protected Audio',
-		'm4v ' => 'Apple iTunes Video (.M4V) Video',
+		'm4a ' => 'Apple iTunes AAC-LC (.M4A) Audio',
+		'm4b ' => 'Apple iTunes AAC-LC (.M4B) Audio Book',
+		'm4p ' => 'Apple iTunes AAC-LC (.M4P) AES Protected Audio',
+		'm4v ' => 'Apple iTunes Video (.M4V) Video',
 		'm4vh' => 'Apple TV (.M4V)',
 		'm4vp' => 'Apple iPhone (.M4V)',
 		'mj2s' => 'Motion JPEG 2000 [ISO 15444-3] Simple Profile',
@@ -89,7 +89,7 @@ class MP4Info_Box_ftyp extends MP4Info_Box {
 		'mp42' => 'MP4 v2 [ISO 14496-14]',
 		'mp71' => 'MP4 w/ MPEG-7 Metadata [per ISO 14496-12]',
 		'mppi' => 'Photo Player, MAF [ISO/IEC 23000-3]',
-		'mqt' => 'Sony / Mobile QuickTime (.MQV)',
+		'mqt ' => 'Sony / Mobile QuickTime (.MQV)',
 		'msnv' => 'MPEG-4 (.MP4) for SonyPSP',
 		'ndas' => 'MP4 v2 [ISO 14496-14] Nero Digital AAC Audio',
 		'ndsc' => 'MPEG-4 (.MP4) Nero Cinema Profile',
@@ -102,11 +102,11 @@ class MP4Info_Box_ftyp extends MP4Info_Box {
 		'ndxm' => 'H.264/MPEG-4 AVC (.MP4) Nero Mobile Profile',
 		'ndxp' => 'H.264/MPEG-4 AVC (.MP4) Nero Portable Profile',
 		'ndxs' => 'H.264/MPEG-4 AVC (.MP4) Nero Standard Profile',
-		'odcf  ' => 'OMA DCF DRM Format 2.0 (OMA-TS-DRM-DCF-V2_0-20060303-A)',
-		'opf2 ' => 'OMA PDCF DRM Format 2.1 (OMA-TS-DRM-DCF-V2_1-20070724-C)',
-		'opx2  ' => 'OMA PDCF DRM + XBS extensions (OMA-TS-DRM_XBS-V1_0-20070529-C)',
+		'odcf' => 'OMA DCF DRM Format 2.0 (OMA-TS-DRM-DCF-V2_0-20060303-A)',
+		'opf2' => 'OMA PDCF DRM Format 2.1 (OMA-TS-DRM-DCF-V2_1-20070724-C)',
+		'opx2' => 'OMA PDCF DRM + XBS extensions (OMA-TS-DRM_XBS-V1_0-20070529-C)',
 		'qt  ' => 'Apple QuickTime (.MOV/QT)',
-		'sdv' => 'SD Memory Card Video',
+		'sdv ' => 'SD Memory Card Video',
 	);
 	
 	
@@ -177,6 +177,18 @@ class MP4Info_Box_ftyp extends MP4Info_Box {
 
 	
 	/**
+	 * Major brand string getter
+	 *
+	 * @author 	Tommy Lacroix <lacroix.tommy@gmail.com>
+	 * @return	int
+	 * @access 	public
+	 */
+	public function getMajorBrandString() {
+		return self::brandToString($this->majorBrand);
+	} // getMajorBrandString method	
+	
+	
+	/**
 	 * Minor version getter
 	 *
 	 * @author 	Tommy Lacroix <lacroix.tommy@gmail.com>
@@ -201,6 +213,22 @@ class MP4Info_Box_ftyp extends MP4Info_Box {
 
 	
 	/**
+	 * Compatible brands' strings getter
+	 *
+	 * @author 	Tommy Lacroix <lacroix.tommy@gmail.com>
+	 * @return	string[]
+	 * @access 	public
+	 */
+	public function getCompatibleBrandsString() {
+		$ret = array();
+		foreach ($this->compatibleBrands as $brand) {
+			$ret[] = self::brandToString($brand);
+		}
+		return $ret;
+	} // getCompatibleBrandsString method	
+		
+	
+	/**
 	 * Convert a brand 32bit code to a string
 	 *
 	 * @author 	Tommy Lacroix <lacroix.tommy@gmail.com>
@@ -210,10 +238,10 @@ class MP4Info_Box_ftyp extends MP4Info_Box {
 	 * @static
 	 */
 	public static function brandToString($brand) {
-		if (isset(self::$$brandNames[$brand])) {
-			return self::$$brandNames[$brand];
+		if (isset(self::$brandNames[pack('N',$brand)])) {
+			return self::$brandNames[pack('N',$brand)];
 		} else {
-			return $brand;
+			return pack('N',$brand).' (0x'.bin2hex(pack('N',$brand)).')';
 		}
 	} // brandToString method
 	

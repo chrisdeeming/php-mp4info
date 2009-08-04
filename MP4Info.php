@@ -56,6 +56,7 @@ class MP4Info {
 		fclose($f);
 		
 		// Return info
+		//self::displayBoxes($boxes);	//die();
 		return self::getInfoFromBoxes($boxes);
 	} // getInfo method
 	
@@ -76,11 +77,20 @@ class MP4Info {
 			$context->hasAudio = false;
 			$context->video = new stdClass();
 			$context->audio = new stdClass();
+			$context->tracks = array('video'=>array(),'audio'=>array());
+			$root = true;
+		} else {
+			$root = false;
 		}
 		
+		// Process each box
 		foreach ($boxes as &$box) {
 			// Interpret box
 			switch ($box->getBoxTypeStr()) {
+				case 'ftyp':
+					$context->majorBrand = $box->getMajorBrandString();
+					$context->compatibleBrands = $box->getCompatibleBrandsString();
+					break;
 				case 'hdlr':
 					switch ($box->getHandlerType()) {
 						case MP4Info_Box_hdlr::HANDLER_VIDEO:
@@ -102,6 +112,7 @@ class MP4Info {
 				case 'uuid':
 					$meta = $box->getXMPMetaData();
 					if ($meta !== false) {
+						$context->xmp = $meta;
 						// Try to get duration
 						if (!isset($context->duration)) {
 							if (preg_match('/<(|[a-z]+:)duration[\s\n\r]([^>]*)>/im',$meta,$m)) {
@@ -187,8 +198,8 @@ class MP4Info {
 					break;
 				case 'stsd':
 					$values = $box->getValues();
-					foreach (array_keys($values) as $codec) {
-						switch ($codec) {
+					foreach ($values as $code=>$data) {
+						switch ($code) {
 							case '.mp3':
 								$context->audio->codec = self::MP4_AUDIO_CODEC_MP3;
 								$context->audio->codecStr = 'MP3';
@@ -200,18 +211,69 @@ class MP4Info {
 								$context->audio->codecStr = 'AAC';
 								$context->hasAudio = true;
 								break;
+							case 'amf0':
+								// meta data?
+								break;
 							case 'avc1':
+							case 'mp4v':
 							case 'h264':
 							case 'H264':
 								$context->video->codec = self::MP4_VIDEO_CODEC_H264;
 								$context->video->codecStr = 'H.264';
+								if (is_array($data)) {
+									if (isset($data['width'])) {
+										$context->video->width = $data['width'];
+									}
+									if (isset($data['height'])) {
+										$context->video->height = $data['height'];
+									}
+								}
 								$context->hasVideo = true;
+								break;
+							default:
+								if (!isset($context->unknownCodecs)) $context->unknownCodecs = array();
+								$context->unknownCodecs[] = $codec;
 								break;
 						}
 					}
 					break;
 				case 'tkhd':
+					// Get track type... first, find children mdia
+					$type = false;
+					foreach ($box->getParent()->children() as $cbox) {
+						if ($cbox->getBoxTypeStr() == 'mdia') {
+							foreach ($cbox->children() as $ccbox) {
+								if ($ccbox->getBoxTypeStr() == 'hdlr') {
+									switch ($ccbox->getHandlerType()) {
+										case MP4Info_Box_hdlr::HANDLER_VIDEO:
+											$type = 'video';
+											break;
+										case MP4Info_Box_hdlr::HANDLER_SOUND:
+										case MP4Info_Box_hdlr::HANDLER_SOUND_ODSM:
+										case MP4Info_Box_hdlr::HANDLER_SOUND_SDSM:
+											$type = 'audio';
+											break;
+										case 'Main':
+										case 'Time':
+											break;
+										default:
+											
+											print $ccbox->getHandlerType();
+											die();
+											break;
+									}
+								}
+							}
+						}
+					}
+					
+					// Save track id
+					if ($type !== false) {
+						$context->tracks[$type][$box->getTrackId()] = true;
+					}
+					
 					if ($box->getWidth() > 0) {
+						// Video track
 						$context->hasVideo = true;
 						$context->video->width = $box->getWidth();
 						$context->video->height = $box->getHeight();
@@ -224,6 +286,27 @@ class MP4Info {
 			if ($box->hasChildren()) {
 				self::getInfoFromBoxes($box->children(), $context);
 			}
+		}
+		
+		// Clean up
+		if ($root) {
+			switch (count($context->tracks['audio'])) {
+				case 0:
+					if (!isset($context->hasAudio)) {
+						$context->hasAudio = false;
+					}
+					break;
+				default:
+					if (!isset($context->hasAudio)) {
+						$context->hasAudio = true;
+					}
+					$context->audio->channels = 1;
+					break;
+			}
+			if (!isset($context->hasAudio)) {
+				$context->hasVideo = count($context->tracks['video']);
+			}
+			unset($context->tracks);
 		}
 		
 		return $context;
@@ -242,7 +325,7 @@ class MP4Info {
 		foreach ($boxes as $box) {
 			print str_repeat('&nbsp;',$level*4) . $box->toString() . '<br>';
 			if ($box->hasChildren()) {
-				$this->displayBoxes($box->children(), $level+1);
+				self::displayBoxes($box->children(), $level+1);
 			}
 		}
 	} // displayBoxes method

@@ -22,6 +22,8 @@ class MP4Info_Box_hdlr extends MP4Info_Box {
 	// {{{ Constants
 	const HANDLER_VIDEO = 'vide';
 	const HANDLER_SOUND = 'soun';
+	const HANDLER_SOUND_ODSM = 'odsm';
+	const HANDLER_SOUND_SDSM = 'sdsm';
 	// }}} Constants
 	
 	/**

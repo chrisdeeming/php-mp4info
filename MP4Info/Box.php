@@ -75,16 +75,28 @@ class MP4Info_Box {
 	 * @param	MP4Info_Box		$parent
 	 * @access 	public
 	 */
-	public function __construct($totalSize, $boxType, $f, $parent=false) {
+	public function __construct($totalSize, $boxType, $f, &$parent=false) {
 		$this->totalSize = $totalSize;
 		$this->boxType = $boxType;
 		$this->boxTypeStr = pack('N',$boxType);
 		$this->data = self::getDataFrom3rd($f,$totalSize);
-		$this->parent = $parent;
+		$this->parent = &$parent;
 		if ($parent != false) {
 			$parent->addChild($this);
 		}
 	} // Constructor
+	
+	
+	/**
+	 * Get box parent
+	 * 
+	 * @author 	Tommy Lacroix <lacroix.tommy@gmail.com>
+	 * @return	MP4Info_Box
+	 * @access 	public
+	 */
+	public function &getParent() {
+		return $this->parent;
+	}
 	
 	/**
 	 * Add a child to this box
@@ -187,7 +199,6 @@ class MP4Info_Box {
 			print '0x'.dechex($boxType).'-'.pack('N',$boxType);
 			if ($parent !== false) print ' in '.$parent->getBoxTypeStr();
 				else print ' in root';
-			die();
 			//$box = new MP4Info_Box($totalSize, $boxType, $f, $parent);
 		}
 		
@@ -295,7 +306,11 @@ class MP4Info_Box {
 		// Get box content
 		if ($ar['totalSize'] > 0) {
 			if ($ar['totalSize'] < 256*1024) {
-				$data = fread($f,$ar['totalSize']-8);
+				if ($ar['totalSize']-8 > 0) {
+					$data = fread($f,$ar['totalSize']-8);
+				} else {
+					$data = '';
+				}
 			} else {
 				$data = $f;
 			}
@@ -350,6 +365,9 @@ class MP4Info_Box {
 			case 0x63747473:	// ctts 	8.15.3 Composition Time to Sample Box
 			case 0x73747373:	// stss		8.20 Sync Sample Box
 			case 0x74726566:	// tref		8.6 Track Reference Box
+			case 0x65647473:	// edts		8.25 Edit Box
+			case 0x66726565:	// free		8.24 Free Space Box
+			case 0x6e64726d:	// ndrm		?? Nero Digital Right Management?
 				return true;	
 			default:
 				return false;
