@@ -100,7 +100,7 @@ class MP4Info_Box_stsd extends MP4Info_Box {
 			$type = substr($desc,4,4);
 			$rawinfo = substr($desc,8,$ar['len']-8);
 			
-			print $type.PHP_EOL;
+			//print $type.PHP_EOL;
 			switch ($type) {
 				case 'avc1':
 				case 'mp4v':
@@ -142,7 +142,7 @@ class MP4Info_Box_stsd extends MP4Info_Box {
 					break;
 				case MP4Info_Box_hdlr::HANDLER_SOUND: 
 				case MP4Info_Box_hdlr::HANDLER_SOUND_ODSM: 
-					print bin2hex($rawinfo);
+					/*print bin2hex($rawinfo);
 					print '<br>';
 					print $rawinfo;
 					print '<br>';
@@ -154,7 +154,7 @@ class MP4Info_Box_stsd extends MP4Info_Box {
 						print $k.'='.$v.' .. (0x'.dechex($v).')'.PHP_EOL;
 					}
 					print_r($ar2);
-					die();
+					die();*/
 					break;
 				default:
 					$info = $rawinfo;
