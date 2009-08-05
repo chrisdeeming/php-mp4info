@@ -50,7 +50,8 @@ class MP4Info {
 			while (($box = MP4Info_Box::fromStream($f))) {
 				$boxes[] = $box;
 			}
-		} catch (Exception $e) { }
+		} catch (Exception $e) { 
+		}
 		
 		// Close
 		fclose($f);
@@ -244,7 +245,7 @@ class MP4Info {
 						if ($cbox->getBoxTypeStr() == 'mdia') {
 							foreach ($cbox->children() as $ccbox) {
 								if ($ccbox->getBoxTypeStr() == 'hdlr') {
-									switch ($ccbox->getHandlerType()) {
+									switch (strtolower($ccbox->getHandlerType())) {
 										case MP4Info_Box_hdlr::HANDLER_VIDEO:
 											$type = 'video';
 											break;
@@ -257,9 +258,8 @@ class MP4Info {
 										case 'Time':
 											break;
 										default:
-											
-											print $ccbox->getHandlerType();
-											die();
+											throw new Exception('Unknown HDLR handler type: '.$ccbox->getHandlerType());
+											//die();
 											break;
 									}
 								}
