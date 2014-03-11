@@ -148,6 +148,8 @@ class MP4Info_Box_tkhd extends MP4Info_Box {
 		$this->volume = MP4Info_Helper::fromFixed8($ar2['volume']);
 		$this->width = MP4Info_Helper::fromFixed16($ar2['width']);
 		$this->height = MP4Info_Helper::fromFixed16($ar2['height']);
+		
+		print_r($this);
 	} // Constructor
 	
 	

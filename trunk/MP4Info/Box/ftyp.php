@@ -46,6 +46,7 @@ class MP4Info_Box_ftyp extends MP4Info_Box {
 	 * @static
 	 */
 	protected static $brandNames = array(
+		'.mp3' => 'MP3 Audio (.MP3)',
 		'3g2a' => '3GPP2 Media (.3G2)',
 		'3ge6' => '3GPP (.3GP) Release 6 MBMS Extended Presentations',
 		'3ge7' => '3GPP (.3GP) Release 7 MBMS Extended Presentations',
@@ -89,7 +90,7 @@ class MP4Info_Box_ftyp extends MP4Info_Box {
 		'mp42' => 'MP4 v2 [ISO 14496-14]',
 		'mp71' => 'MP4 w/ MPEG-7 Metadata [per ISO 14496-12]',
 		'mppi' => 'Photo Player, MAF [ISO/IEC 23000-3]',
-		'mqt' => 'Sony / Mobile QuickTime (.MQV)',
+		'mqt' =>  'Sony / Mobile QuickTime (.MQV)',
 		'msnv' => 'MPEG-4 (.MP4) for SonyPSP',
 		'ndas' => 'MP4 v2 [ISO 14496-14] Nero Digital AAC Audio',
 		'ndsc' => 'MPEG-4 (.MP4) Nero Cinema Profile',
@@ -106,7 +107,7 @@ class MP4Info_Box_ftyp extends MP4Info_Box {
 		'opf2 ' => 'OMA PDCF DRM Format 2.1 (OMA-TS-DRM-DCF-V2_1-20070724-C)',
 		'opx2  ' => 'OMA PDCF DRM + XBS extensions (OMA-TS-DRM_XBS-V1_0-20070529-C)',
 		'qt  ' => 'Apple QuickTime (.MOV/QT)',
-		'sdv' => 'SD Memory Card Video',
+		'sdv' =>  'SD Memory Card Video',
 	);
 	
 	

@@ -21,13 +21,23 @@ class MP4Info {
 	// {{{ Audio codec types
 	const MP4_AUDIO_CODEC_UNCOMPRESSED = 0x00;
 	const MP4_AUDIO_CODEC_MP3 = 0x02;
+	const MP4_AUDIO_CODEC_LINEAR_PCM = 0x03;
+	const MP4_AUDIO_CODEC_LOG_PCM = 0x04;
 	const MP4_AUDIO_CODEC_AAC = 0xe0;
 	// }}}
 	
 	// {{{ Video codec types
+	const MP4_VIDEO_CODEC_DVPP = 0x01;
+	const MP4_VIDEO_CODEC_DV5P = 0x02;
 	const MP4_VIDEO_CODEC_H264 = 0xe0;
 	// }}}	
-	
+
+	/**
+	 * Debug mode
+	 * 
+	 * @var bool
+	 */
+	public static $debugMode = false;	
 
 	/**
 	 * Get information from MP4 file
@@ -89,7 +99,13 @@ class MP4Info {
 						case MP4Info_Box_hdlr::HANDLER_SOUND:
 							$context->hasAudio = true;
 							break;
+						case chr(0x17).'Tim':	// QuickTime Specific
+						case chr(0x18).'App':	// QuickTime Specific
+						case chr(0x19).'App':	// QuickTime Specific
+							break; 
 					}
+					$context->creationTime = $box->getCreationTime();
+					$context->modificationTime = $box->getModificationTime();
 					break;
 				case 'mvhd':
 					$context->duration = $box->getRealDuration();
@@ -189,6 +205,22 @@ class MP4Info {
 					$values = $box->getValues();
 					foreach (array_keys($values) as $codec) {
 						switch ($codec) {
+							case 'sowt':
+							case 'twos':
+							case 'in24':
+							case 'in32':
+							case 'fl32':
+							case 'fl64':
+								$context->audio->codec = self::MP4_AUDIO_CODEC_LINEAR_PCM;
+								$context->audio->codecStr = 'Linear PCM';
+								$context->hasAudio = true;
+								break;
+							case 'alaw':
+							case 'ulaw':
+								$context->audio->codec = self::MP4_AUDIO_CODEC_LOG_PCM;
+								$context->audio->codecStr = 'Logarithmic PCM';
+								$context->hasAudio = true;
+								break;
 							case '.mp3':
 								$context->audio->codec = self::MP4_AUDIO_CODEC_MP3;
 								$context->audio->codecStr = 'MP3';
@@ -205,6 +237,16 @@ class MP4Info {
 							case 'H264':
 								$context->video->codec = self::MP4_VIDEO_CODEC_H264;
 								$context->video->codecStr = 'H.264';
+								$context->hasVideo = true;
+								break;
+							case 'dvpp':
+								$context->video->codec = self::MP4_VIDEO_CODEC_DVPP;
+								$context->video->codecStr = 'DVCPRO PAL';
+								$context->hasVideo = true;
+								break;
+							case 'dv5p':
+								$context->video->codec = self::MP4_VIDEO_CODEC_DV5P;
+								$context->video->codecStr = 'DVCPRO50';
 								$context->hasVideo = true;
 								break;
 						}

@@ -6,24 +6,18 @@
  * @copyright   Copyright (c) 2006-2009 Tommy Lacroix
  * @license		LGPL version 3, http://www.gnu.org/licenses/lgpl.html
  * @package 	php-mp4info
- * @link 		$HeadURL$
+ * @link 		$HeadURL: https://php-mp4info.googlecode.com/svn/trunk/MP4Info/Box/hdlr.php $
  */
 
 // ---
 
 /**
- * 8.9 Handler Reference Box (HDLR)
+ * ?.? Initial Object Descriptor (IODS)
  * 
  * @author 		Tommy Lacroix <lacroix.tommy@gmail.com>
- * @version 	1.0.20090601	$Id$
- * @todo 		Factor this into a fullbox
+ * @version 	1.0.20090601	$Id: hdlr.php 2 2009-06-11 14:12:31Z lacroix.tommy@gmail.com $
  */
-class MP4Info_Box_hdlr extends MP4Info_Box {
-	// {{{ Constants
-	const HANDLER_VIDEO = 'vide';
-	const HANDLER_SOUND = 'soun';
-	// }}} Constants
-	
+class MP4Info_Box_iods extends MP4Info_Box {
 	/**
 	 * Handler type
 	 *
@@ -60,7 +54,7 @@ class MP4Info_Box_hdlr extends MP4Info_Box {
 	 */	
 	public function __construct($totalSize, $boxType, $data, $parent) {
 		if (!self::isCompatible($boxType, $parent)) {
-			throw new Exception('This box isn\'t "hdlr"');
+			throw new Exception('This box isn\'t "iods"');
 		}
 
 		// Get timezone
@@ -76,27 +70,14 @@ class MP4Info_Box_hdlr extends MP4Info_Box {
 
 		// Unpack
 		$ar = unpack('Cversion/C3flags',$data);
-		if ($ar['version'] == 0) {
-			// 32 bit
-			$ar2 = unpack('Nctime/Nmtime/NtimeScale/Nduration',substr($data,4));
-			$len = 6*4;
-		} else if ($ar['version'] == 1) {
-			// 64 bit
-			$ar2 = unpack('N2ctime/N2mtime/NtimeScale/N2duration',substr($data,4));
-			$len = 9*4;
-		} else {
-			throw new Exception('Unhandled version: '.$ar['version']);
-		}
+		$ar2 = unpack('CiodTag/Nlength/nODID/CODProfileLevel/CsceneProfileLevel/CaudioProfileLevel/CvideoProfileLevel/CgraphicsProfileLevel', substr($data,4));
 		
 		// Save		
 		$this->version = $ar['version'];
 		$this->flags = $ar['flags1']*65536+$ar['flags1']*256+$ar['flags1']*1;
-		$this->ctime = date('r',(isset($ar2['ctime']) ? $ar2['ctime'] : $ar2['ctime1'])-2082826800-self::$timezone);
-		$this->mtime = date('r',(isset($ar2['mtime']) ? $ar2['mtime'] : $ar2['mtime1'])-2082826800-self::$timezone);
-		$this->timeScale = $ar2['timeScale'];
-		$this->duration = (isset($ar2['duration']) ? $ar2['duration'] : $ar2['duration1']);
-		$this->handlerType = substr($data,$len,4);
-		$this->name = substr($data,$len+8,-1);
+		
+		print_r($ar2);
+		die();
 	} // Constructor
 	
 	
@@ -111,7 +92,7 @@ class MP4Info_Box_hdlr extends MP4Info_Box {
 	 * @static
 	 */	
 	static public function isCompatible($boxType, $parent) {
-		return $boxType == 0x68646c72;
+		return $boxType == 0x696f6473;
 	} // isCompatible method
 	
 	
