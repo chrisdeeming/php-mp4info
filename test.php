@@ -17,12 +17,14 @@ print '<h1>MP4Info test script</h1>';
 print '<p><small>'.__FILE__.' $Id$</small></p>';
 print '<hr />';
 
+MP4Info::$debugMode = true;
+
 $dir = './TestFiles/';
 $de = opendir($dir);
 if ($de) {
 	while (($file = readdir($de)) !== false) {
 		$path = $dir.$file;
-		if ((!is_file($path)) || (!is_readable($path)) || (strtolower(pathinfo($path,PATHINFO_EXTENSION) != 'f4v'))) continue;
+		if ((!is_file($path)) || (!is_readable($path))) continue;
 		
 		print '<h2>'.$file.'</h2>';
 		print "<pre>";

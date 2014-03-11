@@ -178,17 +178,22 @@ class MP4Info_Box {
 			$box = new MP4Info_Box_meta($totalSize, $boxType, $f, $parent);
 		} else if (MP4Info_Box_stsd::isCompatible($boxType,$parent)) {
 			$box = new MP4Info_Box_stsd($totalSize, $boxType, $f, $parent);
+		} else if (MP4Info_Box_iods::isCompatible($boxType,$parent)) {
+			$box = new MP4Info_Box_iods($totalSize, $boxType, $f, $parent);
 		} else if (MP4Info_Box_ilst::isCompatible($boxType,$parent)) {
 			$box = new MP4Info_Box_ilst($totalSize, $boxType, $f, $parent);
 		} else if (MP4Info_Box_ilst_sub::isCompatible($boxType,$parent)) {
 			$box = new MP4Info_Box_ilst_sub($totalSize, $boxType, $f, $parent);
 		} else {
 			// Debug...
-			print '0x'.dechex($boxType).'-'.pack('N',$boxType);
-			if ($parent !== false) print ' in '.$parent->getBoxTypeStr();
-				else print ' in root';
-			die();
-			//$box = new MP4Info_Box($totalSize, $boxType, $f, $parent);
+			if (MP4Info::$debugMode) {
+				print '0x'.dechex($boxType).'-'.pack('N',$boxType);
+				if ($parent !== false) print ' in '.$parent->getBoxTypeStr();
+					else print ' in root';
+				die();
+			}
+			
+			$box = new MP4Info_Box($totalSize, $boxType, $f, $parent);
 		}
 		
 		// Return box
@@ -281,7 +286,7 @@ class MP4Info_Box {
 
 		// Check if we need to skip
 		if (self::skipBoxType($ar['boxType'])) {
-			//print '+++ Skipping box '.pack('N',$ar['boxType']).'<br>';
+			//print '+++ Skipping box '.pack('N',$ar['boxType']).' -- '.$ar['totalSize'].'<br>';
 			fseek($f,$ar['totalSize']-8,SEEK_CUR);
 			return self::fromStream($f,$parent);
 		}
@@ -293,7 +298,8 @@ class MP4Info_Box {
 		}
 		
 		// Get box content
-		if ($ar['totalSize'] > 0) {
+		//print '+++ Reading box '.pack('N',$ar['boxType']).' of size '.$ar['totalSize'].'<br>';
+		if ($ar['totalSize'] > 8) {
 			if ($ar['totalSize'] < 256*1024) {
 				$data = fread($f,$ar['totalSize']-8);
 			} else {
@@ -335,7 +341,7 @@ class MP4Info_Box {
 	 */
 	public static function skipBoxType($boxType) {
 		switch ($boxType) {
-			case 0x696f6473:	// iods		5.1 Initial Object Descriptor Box
+			//case 0x696f6473:	// iods		5.1 Initial Object Descriptor Box
 			case 0x55c40000:	// ???		??
 			case 0x6d646174:	// mdat		?? Movie Data
 			case 0x736d6864:	// smhd		8.11.3 Sound Media Header Box
@@ -350,6 +356,13 @@ class MP4Info_Box {
 			case 0x63747473:	// ctts 	8.15.3 Composition Time to Sample Box
 			case 0x73747373:	// stss		8.20 Sync Sample Box
 			case 0x74726566:	// tref		8.6 Track Reference Box
+			case 0x6c6f6164:	// load		??
+			case 0x65647473:	// edts		?.? Edit List
+			case 0x676d6864:	// gmhd		??
+			case 0x66726565:	// free		??
+			case 0x77696465:	// wide		??
+			case 0x6d617474:	// matt		?.? Track Matte
+			case 0x6372676e:	// crgn		?.? Clipping Region
 				return true;	
 			default:
 				return false;
@@ -448,4 +461,5 @@ include "Box/meta.php";
 include "Box/stsd.php";
 include "Box/ilst.php";
 include "Box/ilst_sub.php";
+include "Box/iods.php";
 // }}} Dependencies
